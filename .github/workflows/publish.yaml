@@ -49,7 +49,7 @@ jobs:
 
     - name: Push Docker image
       id: docker-build-push
-      uses: docker/build-push-action@v2.10.0 # v3.0.0 failed, v2.5.0 worked
+      uses: docker/build-push-action@v2.6.0 # v2.10.0, v3.0.0 failed, v2.5.0 worked
       with:
         context: .
         push: true
