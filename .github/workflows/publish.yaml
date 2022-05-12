@@ -49,7 +49,7 @@ jobs:
 
     - name: Push Docker image
       id: docker-build-push
-      uses: docker/build-push-action@v2.9.0 # v2.10.0, v3.0.0 failed; v2.5-2.8 worked
+      uses: docker/build-push-action@v2.10.0 # v2.10.0, v3.0.0 failed; v2.5-2.9 worked
       with:
         context: .
         push: true
@@ -59,8 +59,8 @@ jobs:
     - name: Get image digest
       id: digest
       run: |
-        docker inspect ${{ steps.docker-build-push.outputs.digest }} | jq
-        echo "::set-output name=digest::$(docker inspect ${{ steps.docker-build-push.outputs.digest }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')"
+        docker inspect ${{ steps.docker-build-push.outputs.imageid }} | jq
+        echo "::set-output name=digest::$(docker inspect ${{ steps.docker-build-push.outputs.imageid }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')"
 
     - name: Generate provenance
       uses: slsa-framework/github-actions-demo@v0.1
