@@ -49,7 +49,7 @@ jobs:
 
     - name: Push Docker image
       id: docker-build-push
-      uses: docker/build-push-action@v3.0.0
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc # v3.0.0 failed
       with:
         context: .
         push: true
