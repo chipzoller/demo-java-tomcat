@@ -91,7 +91,7 @@ jobs:
     steps:
 
     - name: Scan for vulnerabilities
-      uses: aquasecurity/trivy-action@0.2.2
+      uses: aquasecurity/trivy-action@0.3.0
       with: 
         scan-type: 'image'
         image-ref: ${{ needs.build-image.outputs.image }}
