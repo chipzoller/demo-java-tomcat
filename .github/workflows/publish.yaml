@@ -77,8 +77,8 @@ jobs:
     - name: Upload provenance
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: provenanceclean.json
-        path: provenance.json
+        name: provenance.json
+        path: provenanceclean.json
 
     - name: Lowecase repo name
       id: repo
