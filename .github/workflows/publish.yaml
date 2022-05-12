@@ -72,12 +72,12 @@ jobs:
       # For that, it expects just the raw predicate so we extract just that here.
     - name: Strip away in-toto attestation format
       id: strip
-      run: jq .predicate provenance.json > provenanceclean.json
+      run: jq .predicate provenance.json > provenanceclean.json && cat provenanceclean.json
 
     - name: Upload provenance
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: provenance.json
+        name: provenanceclean.json
         path: provenanceclean.json
 
     - name: Lowecase repo name
@@ -153,7 +153,7 @@ jobs:
 
     - uses: actions/download-artifact@v3.0.0
       with:
-        name: provenance.json
+        name: provenanceclean.json
 
     - name: Install Cosign
       uses: sigstore/cosign-installer@v2.3.0
@@ -192,5 +192,5 @@ jobs:
     - name : Attest Provenance
       env:
         COSIGN_EXPERIMENTAL: "true"    
-      run: cosign attest --force --predicate provenance.json --type slsaprovenance  ${{ needs.build-image.outputs.image }} # previously --type https://example.com/provenance/v1
+      run: cosign attest --force --predicate provenanceclean.json --type slsaprovenance  ${{ needs.build-image.outputs.image }} # previously --type https://example.com/provenance/v1
 
