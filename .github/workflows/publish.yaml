@@ -185,5 +185,5 @@ jobs:
     - name : Attest Provenance
       env:
         COSIGN_EXPERIMENTAL: "true"    
-      run: cosign attest --force --predicate provenance.json --type https://example.com/provenance/v1  ${{ needs.build-image.outputs.image }}
+      run: cosign attest --force --predicate provenance.json --type slsaprovenance  ${{ needs.build-image.outputs.image }} # previously --type https://example.com/provenance/v1
 
