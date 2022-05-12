@@ -120,7 +120,7 @@ jobs:
     steps:
 
     - name: Generate SBOM
-      uses: anchore/sbom-action@v0.6.0
+      uses: anchore/sbom-action@v0.11.0
       with:
         image:  ${{ needs.build-image.outputs.image }}
         artifact-name: sbom.json
