@@ -63,11 +63,12 @@ jobs:
 
       # Generates a SLSA predicate type
     - name: SLSA Build Provenance Action
+      id: genslsaprovenance
       uses: philips-labs/slsa-provenance-action@v0.7.2
-        with:
-          command: generate
-          subcommand: files
-          arguments: --artifact-path build/libs/service.war --output-path provenance.json
+      with:
+        command: generate
+        subcommand: files
+        arguments: --artifact-path build/libs/service.war --output-path provenance.json
 
     - name: View generated provenance file
       id: viewprov
