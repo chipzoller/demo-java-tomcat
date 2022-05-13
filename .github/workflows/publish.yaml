@@ -12,7 +12,7 @@ env:
 jobs:
 
   build-image:
-    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
+    runs-on: ubuntu-20.04
     outputs:
       image: ${{ env.REGISTRY }}/${{ steps.repo.outputs.repo }}:latest@${{ steps.digest.outputs.digest }}
     permissions:
@@ -109,7 +109,7 @@ jobs:
         echo "image: ${{ env.REGISTRY }}/${{ steps.repo.outputs.repo }}:latest@${{ steps.digest.outputs.digest }}"
 
   scan-image:
-    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
+    runs-on: ubuntu-20.04
     needs: [build-image]
     permissions:
       contents: read
@@ -138,7 +138,7 @@ jobs:
         if-no-files-found: error
 
   generate-sbom:
-    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
+    runs-on: ubuntu-20.04
     needs: [build-image]
     permissions:
       contents: write # previously read, which caused failures when uploading the SBOM although it was present somehow.
@@ -152,7 +152,7 @@ jobs:
         format: cyclonedx-json
 
   sign-image-attestations:
-    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
+    runs-on: ubuntu-20.04
     needs: [build-image, scan-image, generate-sbom]
     permissions:
       contents: read
