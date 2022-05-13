@@ -12,7 +12,7 @@ env:
 jobs:
 
   build-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
     outputs:
       image: ${{ env.REGISTRY }}/${{ steps.repo.outputs.repo }}:latest@${{ steps.digest.outputs.digest }}
     permissions:
@@ -20,20 +20,20 @@ jobs:
       packages: write
     steps:
 
-    - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-java@v3.3.0 # v2 worked
+    - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
+    - uses: actions/setup-java@860f60056505705214d223b91ed7a30f173f6142 #v3.3.0
       with:
         distribution: temurin
         java-version: 11
     
     - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2.1.5 #v2 worked
+      uses: gradle/gradle-build-action@fec4a42eb0c83154e5c9590748ba8337949c5701 # v2.1.5
 
     - name: Execute Gradle build
       run: ./gradlew build
 
     - name: Log in to the Container registry
-      uses: docker/login-action@v2.0.0
+      uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # v2.0.0
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
@@ -41,7 +41,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta
-      uses: docker/metadata-action@v4.0.1
+      uses: docker/metadata-action@69f6fc9d46f2f8bf0d5491e4aabe0bb8c6a4678a # v4.0.1
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
@@ -49,7 +49,7 @@ jobs:
 
     - name: Push Docker image
       id: docker-build-push
-      uses: docker/build-push-action@v3.0.0
+      uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8 # v3.0.0
       with:
         context: .
         push: true
@@ -66,7 +66,7 @@ jobs:
       # with predicateType https://in-toto.io/Provenance/v0.1.
     - name: Generate SLSA Provenance
       id: genslsaprovenance
-      uses: philips-labs/slsa-provenance-action@v0.7.2
+      uses: philips-labs/slsa-provenance-action@dddb40e199ae28d4cd2f17bad7f31545556fdd3d # v0.7.2
       with:
         command: generate
         subcommand: files
@@ -78,7 +78,7 @@ jobs:
       # (https://slsa.dev/provenance/v0.2)
     # - name: Generate in-toto provenance
     #   id: genintotoprovenance
-    #   uses: slsa-framework/github-actions-demo@v0.1
+    #   uses: slsa-framework/github-actions-demo@9474e92bbf825d5b4b46810fc9367dfc73429a2a # v0.1
     #   with:
     #     artifact_path: build/libs/service.war
     #     output_path: provenance.json
@@ -92,7 +92,7 @@ jobs:
       run: jq .predicate provenance.json > provenanceclean.json && cat provenanceclean.json
 
     - name: Upload provenance
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
       with:
         name: provenanceclean.json
         path: provenanceclean.json
@@ -109,14 +109,14 @@ jobs:
         echo "image: ${{ env.REGISTRY }}/${{ steps.repo.outputs.repo }}:latest@${{ steps.digest.outputs.digest }}"
 
   scan-image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
     needs: [build-image]
     permissions:
       contents: read
     steps:
 
     - name: Scan for vulnerabilities
-      uses: aquasecurity/trivy-action@0.3.0
+      uses: aquasecurity/trivy-action@4b9b6fb4ef28b31450391a93ade098bb00de584e # v0.3.0
       with: 
         scan-type: 'image'
         image-ref: ${{ needs.build-image.outputs.image }}
@@ -126,33 +126,33 @@ jobs:
         output: trivy-scan.json
 
     - name: Add scan metadata
-      uses: sergeysova/jq-action@v2
+      uses: sergeysova/jq-action@9ac92a6da6d616b4cebdddc0059e36a1ad43fab1 # v2.1.0
       with:
         cmd: cat trivy-scan.json | jq '. + {timestamp:(now|todateiso8601)}' | jq '. + {scanner:"trivy"}' > scan.json
 
     - name: Upload vulnerability scan report
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
       with:
         name: scan.json
         path: scan.json
         if-no-files-found: error
 
   generate-sbom:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
     needs: [build-image]
     permissions:
       contents: write # previously read, which caused failures when uploading the SBOM although it was present somehow.
     steps:
 
     - name: Generate SBOM
-      uses: anchore/sbom-action@v0.11.0
+      uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a # v0.11.0
       with:
         image:  ${{ needs.build-image.outputs.image }}
         artifact-name: sbom.json
         format: cyclonedx-json
 
   sign-image-attestations:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04@8dfb3fd64aecd43450a4ce37c11f98227f69a668 # Ubuntu 20.04.4 LTS Image Version: 20220508.1
     needs: [build-image, scan-image, generate-sbom]
     permissions:
       contents: read
@@ -160,25 +160,25 @@ jobs:
       id-token: write   # This is the key for OIDC!
     steps:
 
-    - uses: actions/download-artifact@v3.0.0
+    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
       with:
         name: sbom.json
 
-    - uses: actions/download-artifact@v3.0.0
+    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
       with:
         name: scan.json
 
-    - uses: actions/download-artifact@v3.0.0
+    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
       with:
         name: provenanceclean.json
 
     - name: Install Cosign
-      uses: sigstore/cosign-installer@v2.3.0
+      uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730 # v2.3.0
       with:
         cosign-release: 'v1.8.0'
 
     - name: Log in to the Container registry
-      uses: docker/login-action@v2.0.0
+      uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # v2.0.0
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
